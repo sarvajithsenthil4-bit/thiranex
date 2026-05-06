@@ -1,0 +1,104 @@
+class Book:
+    def __init__(self, book_id, title, author):
+        self.book_id = book_id
+        self.title = title
+        self.author = author
+        self.is_issued = False
+
+    def __str__(self):
+        status = "Issued" if self.is_issued else "Available"
+        return f"[{self.book_id}] {self.title} by {self.author} - {status}"
+
+
+class Member:
+    def __init__(self, member_id, name):
+        self.member_id = member_id
+        self.name = name
+        self.borrowed_books = []
+
+    def __str__(self):
+        return f"[{self.member_id}] {self.name}"
+
+
+class Library:
+    def __init__(self):
+        self.books = []
+        self.members = []
+
+    # Add book
+    def add_book(self, book):
+        self.books.append(book)
+        print("Book added successfully!")
+
+    # Add member
+    def add_member(self, member):
+        self.members.append(member)
+        print("Member added successfully!")
+
+    # Issue book
+    def issue_book(self, book_id, member_id):
+        book = next((b for b in self.books if b.book_id == book_id), None)
+        member = next((m for m in self.members if m.member_id == member_id), None)
+
+        if book and member:
+            if not book.is_issued:
+                book.is_issued = True
+                member.borrowed_books.append(book)
+                print("Book issued successfully!")
+            else:
+                print("Book is already issued.")
+        else:
+            print("Invalid book or member ID.")
+
+    # Return book
+    def return_book(self, book_id, member_id):
+        member = next((m for m in self.members if m.member_id == member_id), None)
+
+        if member:
+            book = next((b for b in member.borrowed_books if b.book_id == book_id), None)
+
+            if book:
+                book.is_issued = False
+                member.borrowed_books.remove(book)
+                print("Book returned successfully!")
+            else:
+                print("This member does not have this book.")
+        else:
+            print("Invalid member ID.")
+
+    # Search by title
+    def search_by_title(self, title):
+        results = [b for b in self.books if title.lower() in b.title.lower()]
+        return results
+
+    # Search by author
+    def search_by_author(self, author):
+        results = [b for b in self.books if author.lower() in b.author.lower()]
+        return results
+
+    # Display all books
+    def display_books(self):
+        for book in self.books:
+            print(book)
+
+
+# ----------- Main Program -----------
+library = Library()
+
+# Sample data
+library.add_book(Book(1, "Python Basics", "John Doe"))
+library.add_book(Book(2, "Data Structures", "Jane Smith"))
+
+library.add_member(Member(101, "Alice"))
+library.add_member(Member(102, "Bob"))
+
+# Operations
+library.issue_book(1, 101)
+library.display_books()
+
+print("\nSearch by Title 'Python':")
+for book in library.search_by_title("Python"):
+    print(book)
+
+library.return_book(1, 101)
+library.display_books()
